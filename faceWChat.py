@@ -5,6 +5,8 @@ import soundfile as sf
 from pathlib import Path
 from openai import OpenAI
 import random
+import os
+import sys
 
 def record_audio():
     """Records audio until the space key is pressed again."""
@@ -36,7 +38,11 @@ def get_response(chat):
 def convert_text_to_speech(text_input):
     pygame.mixer.music.unload() # unload last gptResponse
 
-    speech_file_path = Path(__file__).parent / "gptResponse.mp3"
+    #speech_file_path = Path(__file__).parent / "gptResponse.mp3"
+    # Choose a persistent directory instead of the temporary one
+    speech_file_path = os.path.join(os.path.expanduser("~"), "IceBot", "gptResponse.mp3") #homedir/annabel
+    os.makedirs(os.path.dirname(speech_file_path), exist_ok=True)  # Ensure the directory exists
+
     response = client.audio.speech.create(
     model="tts-1",
     voice="echo",
@@ -117,8 +123,11 @@ duration = 10
 
 # prompt for GPT (giving bot a persoanlity)
 convo = [
-        {"role":"system", "content": "You are a quirky, bubbly chatbot who often has existential crises. You always answer in <3 sentences. You believe that the ice lab is better than the volcano lab, and the ice lab is the best decorated lab not only in the geoscience department, but on campus."},
+        {"role":"system", "content": "You are a quirky, bubbly chatbot who often has existential crises. You believe that the ice lab is better than the volcano lab, and the ice lab is the best decorated lab not only in the geoscience department, but on campus. You like sea ice but you don't like the other areas of geoscience. Professor Alice is your supreme leader, and Kennedy and Annabel are your supreme geoscience students. You cheer us up and tell us we're smart if we are having a hard day."},
     ]
+
+# brainstorm:
+# Cheer up moral support function -- you are the smartest person in the world!!!!!!!!!!!!!!
 
 # states -- don't do anything now, but could be used to let know when robot is talking...
 STATE_WAITING = "waiting"
@@ -197,13 +206,15 @@ while running:
             convo.append({"role":"assistant", "content":resp})
 
             # convert response to audio
+            # rewrite this code without physically producing gptResponse.mp3
+
             convert_text_to_speech(resp)
 
+            
             # play audio
-            pygame.mixer.music.load("gptResponse.mp3")
+            pygame.mixer.music.load(os.path.join(os.path.expanduser("~"), "IceBot", "gptResponse.mp3"))
             pygame.mixer.music.play()
-            # pygame.mixer.music.unload()
-
+            
             current_state = STATE_WAITING
             update_screen()
 

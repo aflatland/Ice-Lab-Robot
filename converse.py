@@ -1,10 +1,7 @@
 import sounddevice as sd
 import keyboard
-import numpy as np
 import soundfile as sf
-import io
 from pathlib import Path
-import winsound
 from openai import OpenAI
 from pydub import AudioSegment
 from pydub.playback import play
